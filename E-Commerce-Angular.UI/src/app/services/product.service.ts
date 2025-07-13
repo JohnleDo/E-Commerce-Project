@@ -22,4 +22,17 @@ export class ProductService {
       product
     );
   }
+
+  public AddProduct(product: Product): Observable<Product> {
+    return this.http.post<Product>(
+      (environment as any).apiUrl + this.url,
+      product
+    );
+  }
+
+  public DeleteProduct(id: number): Observable<Product> {
+    return this.http.delete<Product>(
+      `${(environment as any).apiUrl + this.url}/${id}`
+    );
+  }
 }

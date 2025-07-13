@@ -1,19 +1,79 @@
 import { Component, signal } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { ToastModule } from 'primeng/toast';
+import { CommonModule } from '@angular/common';
+import { FormsModule, NgForm } from '@angular/forms';
+
 import { Product } from '../../models/products.model';
 import { ProductService } from '../../services/product.service';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { TagModule } from 'primeng/tag';
+import { ToastModule } from 'primeng/toast';
+import { DialogModule } from 'primeng/dialog';
 import { MessageService } from 'primeng/api';
 
+// TODO: Need to add validation in backend for the product model
+// TODO: When deleting a product, it does a weird reload. Figure out a better
+//       way to do it. It feels gltichy
+// TODO: Add filtering and sorting functionality
+// TODO: Add popup confirmation when deleting a product
+// TODO: Make the DialogCancel function modular where it can be used in other places.
+//       May want to use it after deleting a product since it's causing validations to
+//       appear when deleting a product
 @Component({
   selector: 'app-products-list',
-  imports: [TableModule, ButtonModule, TagModule, FormsModule, CommonModule, ToastModule],
+  imports: [CommonModule, FormsModule, ButtonModule, DialogModule, TableModule, TagModule, ToastModule],
   providers: [MessageService],
   template: `
+    <!-- Dialog Code -->
+    <div class="card flex justify-center">
+      <p-dialog header="Add New Product" [modal]="true" [(visible)]="dialogIsVisible" [style]="{ width: '30rem' }">
+        <span class="p-text-secondary block mb-8">Enter product details below.</span>
+        <form #productForm="ngForm" (ngSubmit)="productForm.valid && this.addProduct()">
+          <div class="flex items-center gap-4 mb-4">
+            <label for="productName" class="font-semibold w-24">Name</label>
+            <input pInputText id="productName" class="flex-auto" [(ngModel)]="newProduct.name" name="name" required autocomplete="off" />
+            <div *ngIf="productForm.submitted && (!newProduct.name || newProduct.name.trim() === '')" class="text-red-500 text-sm">
+              Name is required.
+            </div>
+          </div>
+          <div class="flex items-center gap-4 mb-4">
+            <label for="productDescription" class="font-semibold w-24">Description</label>
+            <input pInputText id="productDescription" class="flex-auto" [(ngModel)]="newProduct.description" name="description" required autocomplete="off" />
+            <div *ngIf="productForm.submitted && (!newProduct.description || newProduct.description.trim() === '')" class="text-red-500 text-sm">
+              Description is required.
+            </div>
+          </div>
+          <div class="flex items-center gap-4 mb-4">
+            <label for="productPrice" class="font-semibold w-24">Price</label>
+            <input pInputText id="productPrice" type="number" class="flex-auto" [(ngModel)]="newProduct.price" name="price" required autocomplete="off" />
+            <div *ngIf="productForm.submitted && newProduct.price <= 0" class="text-red-500 text-sm">
+              Price must be greater than 0.
+            </div>
+          </div>
+          <div class="flex items-center gap-4 mb-4">
+            <label for="productQuantity" class="font-semibold w-24">Quantity</label>
+            <input pInputText id="productQuantity" type="number" class="flex-auto" [(ngModel)]="newProduct.stockQuantity" name="stockQuantity" required autocomplete="off" />
+            <div *ngIf="productForm.submitted && newProduct.stockQuantity <= 0" class="text-red-500 text-sm">
+              Quantity must be greater than 0.
+            </div>
+          </div>
+          <div class="flex items-center gap-4 mb-8">
+            <label for="productImage" class="font-semibold w-24">Image URL</label>
+            <input pInputText id="productImage" class="flex-auto" [(ngModel)]="newProduct.image" name="image" required autocomplete="off" />
+            <div *ngIf="productForm.submitted && (!newProduct.image || newProduct.image.trim() === '')" class="text-red-500 text-sm">
+              Image URL is required.
+            </div>
+          </div>
+          <div class="flex justify-end gap-2">
+            <p-button label="Cancel" severity="secondary" (click)="this.onDialogCancel(productForm)" />
+            <p-button label="Save" type="submit" />
+          </div>
+        </form>
+      </p-dialog>
+    </div>
+
+    <!-- Table Code -->
     <div class="w-full flex justify-center mt-10">
       <p-toast />
       <div class="w-[90%] max-w-8xl">
@@ -30,7 +90,10 @@ import { MessageService } from 'primeng/api';
           <ng-template pTemplate="caption">
             <div class="flex items-center justify-between w-full px-2 py-2">
               <span class="text-lg font-semibold">Products</span>
-              <p-button icon="pi pi-refresh" (onClick)="this.getProducts()" />
+              <div class="flex gap-2">
+                <p-button icon="pi pi-plus" (onClick)="this.showDialog()" />
+                <p-button icon="pi pi-refresh" (onClick)="this.getProducts()" />
+            </div>
             </div>
           </ng-template>
           <ng-template pTemplate="header">
@@ -118,6 +181,16 @@ import { MessageService } from 'primeng/api';
                         class="p-button-rounded p-button-text">
                     </button>
                     <button 
+                        *ngIf="!editing" 
+                        pButton 
+                        pRipple 
+                        type="button" 
+                        pInitEditableRow 
+                        icon="pi pi-trash" 
+                        (click)="onRowDelete(product)" 
+                        class="p-button-rounded p-button-text p-button-danger">
+                    </button>
+                    <button 
                         *ngIf="editing" 
                         pButton 
                         pRipple 
@@ -155,6 +228,16 @@ import { MessageService } from 'primeng/api';
 export class ProductsManageComponent {
   productList = signal<Product[]>([]);
   isLoading = false;
+  dialogIsVisible = false;
+
+  newProduct: Product = {
+    id: 0, 
+    name: '',
+    description: '',
+    price: 1,
+    stockQuantity: 1,
+    image: ''
+  };
 
   constructor(private productService: ProductService, private messageService: MessageService) {}
 
@@ -162,12 +245,36 @@ export class ProductsManageComponent {
     this.getProducts();
   }
 
+  showDialog():void {
+    this.dialogIsVisible = true;
+  }
+
+  onDialogCancel(productForm: NgForm): void {
+    // Reset the form's validation state
+    productForm.resetForm();
+
+    // Reset the form when the dialog is closed
+    this.newProduct = {
+    id: 0, 
+    name: '',
+    description: '',
+    price: 1,
+    stockQuantity: 1,
+    image: ''
+    };
+
+    this.dialogIsVisible = false;
+  }
+
   getProducts(): void {
     this.isLoading = true;
     
     this.productService.GetProducts().subscribe({
       next: (result: Product[]) => {
-        this.productList.set(result);
+        // Sort products by id in descending order, would've been better if I 
+        // implemented an CreatedDateTime and UpdatedDateTime and sorta by that
+        const sortedProducts = result.sort((a, b) => b.id - a.id);
+        this.productList.set(sortedProducts);
         this.isLoading = false;
         console.log('Products:', result);
       },
@@ -198,5 +305,37 @@ export class ProductsManageComponent {
   }
 
   onRowEditCancel(product: any, rowIndex: number) {
+  }
+
+  onRowDelete(product: any) {
+    this.productService.DeleteProduct(product.id).subscribe({
+      next: (result) => {
+        this.productList.update(products =>
+          products.filter(p => p.id !== result.id)
+        );
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: product.name + ' was deleted successfully' });
+        this.getProducts(); // Refresh the product list
+      },
+      error: (err: Error) => {
+        this.messageService.add({severity:'error', summary: product.name + ' failed to delete'})
+        console.error('Error deleting product:', err);
+      }
+    });
+  }
+
+  addProduct(): void {
+    this.productService.AddProduct(this.newProduct).subscribe({
+      next: (result: Product) => {
+        this.productList.update(products => [...products, result]); // Add the new product with the generated id
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Product added successfully' });
+        this.dialogIsVisible = false;
+        this.newProduct = { id: 0, name: '', description: '', price: 1, stockQuantity: 1, image: '' }; // Reset form
+        this.getProducts(); // Refresh the product list
+      },
+      error: (err: Error) => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to add product' });
+        console.error('Error adding product:', err);
+      }
+    });
   }
 }

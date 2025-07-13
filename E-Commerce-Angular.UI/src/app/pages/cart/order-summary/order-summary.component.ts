@@ -2,6 +2,8 @@ import { Component, computed, inject } from '@angular/core';
 import { PrimaryButtonComponent } from '../../../components/primary-button/primary-button.component';
 import { CartService } from '../../../services/cart.service';
 
+// TODO: Add checkout functionality where it will reduce the quantity in the database
+
 @Component({
   selector: 'app-order-summary',
   imports: [PrimaryButtonComponent],

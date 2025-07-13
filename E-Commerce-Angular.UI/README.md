@@ -1,6 +1,17 @@
 # ECommerceAngularUI
+-----------------------------------------------------------------------------------
 Youtube Video Tutorial: https://youtu.be/RNr1QZM4A38?si=ACS3OeBU0fOge7AG
 Original Git Repo: https://github.com/thisiszoaib/angular-ecommerce/tree/master
+-----------------------------------------------------------------------------------
+
+# HOW TO RUN PROJECT
+-----------------------------------------------------------------------------------
+This projects runs using the MyAppAPI project: E:\Desktop\Git\Learning Tutorial Example\CleanArchitecture\MyApp.Api
+
+Make sure to have the API running beforehand. Once running go into VSCode and use the terminal and be in the directory: E:\Desktop\Git\E-Commerce Project\E-Commerce-Angular.UI
+
+Once in directory run command: ng serve --open
+-----------------------------------------------------------------------------------
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.7.
 
