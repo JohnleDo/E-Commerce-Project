@@ -16,7 +16,7 @@ import { MessageService } from 'primeng/api';
 // TODO: When deleting a product, it does a weird reload. Figure out a better
 //       way to do it. It feels gltichy
 // TODO: Add filtering and sorting functionality
-// TODO: Add popup confirmation when deleting a product
+// DONE (12/9/2025): Add popup confirmation when deleting a product
 // TODO: Make the DialogCancel function modular where it can be used in other places.
 //       May want to use it after deleting a product since it's causing validations to
 //       appear when deleting a product
@@ -25,7 +25,7 @@ import { MessageService } from 'primeng/api';
   imports: [CommonModule, FormsModule, ButtonModule, DialogModule, TableModule, TagModule, ToastModule],
   providers: [MessageService],
   template: `
-    <!-- Dialog Code -->
+    <!-- Dialog Code for Adding New Product -->
     <div class="card flex justify-center">
       <p-dialog header="Add New Product" [modal]="true" [(visible)]="dialogIsVisible" [style]="{ width: '30rem' }">
         <span class="p-text-secondary block mb-8">Enter product details below.</span>
@@ -73,6 +73,17 @@ import { MessageService } from 'primeng/api';
       </p-dialog>
     </div>
 
+    <!-- Dialog Code for Confirming Deletion -->
+    <div class="card flex justify-center">
+      <p-dialog header="Delete Confirmation" [modal]="true" [(visible)]="dialogDeleteIsVisible" [style]="{ width: '30rem' }">
+        <span class="p-text-secondary block mb-8">Are you sure you want to delete this item?</span>
+        <div class="flex justify-end gap-2">
+          <p-button label="Cancel" severity="secondary" (click)="this.onDialogDeleteCancel()" />
+          <p-button label="Confirm" (click)="this.onDialogConfirmDelete()"/>
+        </div>
+      </p-dialog>
+    </div>
+
     <!-- Table Code -->
     <div class="w-full flex justify-center mt-10">
       <p-toast />
@@ -83,9 +94,9 @@ import { MessageService } from 'primeng/api';
           dataKey="id"
           editMode="row"
           [paginator]="true"
-          [rows]="5"
+          [rows]="20"
           [tableStyle]="{ 'min-width': '50rem' }"
-          [rowsPerPageOptions]="[5, 10, 20]"
+          [rowsPerPageOptions]="[5, 10, 20, 50, 100]"
         >
           <ng-template pTemplate="caption">
             <div class="flex items-center justify-between w-full px-2 py-2">
@@ -184,10 +195,9 @@ import { MessageService } from 'primeng/api';
                         *ngIf="!editing" 
                         pButton 
                         pRipple 
-                        type="button" 
-                        pInitEditableRow 
-                        icon="pi pi-trash" 
-                        (click)="onRowDelete(product)" 
+                        type="button"  
+                        icon="pi pi-trash"
+                        (click)="this.showDeleteDialog(product)"
                         class="p-button-rounded p-button-text p-button-danger">
                     </button>
                     <button 
@@ -229,6 +239,8 @@ export class ProductsManageComponent {
   productList = signal<Product[]>([]);
   isLoading = false;
   dialogIsVisible = false;
+  dialogDeleteIsVisible = false;
+  productToDelete: Product | null = null;
 
   newProduct: Product = {
     id: 0, 
@@ -249,6 +261,11 @@ export class ProductsManageComponent {
     this.dialogIsVisible = true;
   }
 
+  showDeleteDialog(product: any):void {
+    this.productToDelete = product;
+    this.dialogDeleteIsVisible = true;
+  }
+
   onDialogCancel(productForm: NgForm): void {
     // Reset the form's validation state
     productForm.resetForm();
@@ -264,6 +281,18 @@ export class ProductsManageComponent {
     };
 
     this.dialogIsVisible = false;
+  }
+
+  onDialogDeleteCancel(): void {
+    this.productToDelete = null;
+    this.dialogDeleteIsVisible = false;
+  }
+
+  onDialogConfirmDelete(): void {
+    // Maybe add some error handling here if productToDelete is null
+    this.onRowDelete(this.productToDelete);
+    this.productToDelete = null;
+    this.dialogDeleteIsVisible = false;
   }
 
   getProducts(): void {

@@ -3,6 +3,11 @@ import { Product } from '../../../models/products.model';
 import { PrimaryButtonComponent } from "../../../components/primary-button/primary-button.component";
 import { CartService } from '../../../services/cart.service';
 
+// TODO: Add image placeholder if image URL is invalid
+// TODO: Add notification on adding to cart
+// TODO: Change the button to add to cart to how many items to add when clicked
+// TODO: When clicking on the card (not the button), open a detailed view of the product
+
 @Component({
   selector: 'app-product-card',
   imports: [PrimaryButtonComponent],
