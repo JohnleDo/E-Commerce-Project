@@ -6,7 +6,7 @@ Original Git Repo: https://github.com/thisiszoaib/angular-ecommerce/tree/master
 
 # HOW TO RUN PROJECT
 -----------------------------------------------------------------------------------
-This projects runs using the MyAppAPI project: E:\Desktop\Git\Learning Tutorial Example\CleanArchitecture\MyApp.Api
+This projects runs using the MyAppAPI project: E:\Desktop\Git\Full Stack Project (Angular and .NET Core)\MyApp API
 
 Make sure to have the API running beforehand. Once running go into VSCode and use the terminal and be in the directory: E:\Desktop\Git\E-Commerce Project\E-Commerce-Angular.UI
 
