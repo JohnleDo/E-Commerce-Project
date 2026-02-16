@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { SignupComponent } from "./signup/signup.component";
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
+import { LoginResponse } from '../../models/api/login.response';
 
 // TODO: Hide header when on login/signup page
 // TODO: Implement actual authentication service
@@ -157,8 +158,9 @@ export class LoginComponent {
 
     const { userName, password, rememberMe } = this.loginForm.value;
 
+    // TODO: Display error messages based on actual error (e.g. invalid credentials, server error, etc.)
     this.userService.UserLogin({ userName: userName, password }).subscribe({
-          next: (result: User) => {
+          next: (result: LoginResponse) => {
             this.isLoading = false;
             console.log('Login successful:', result);
             this.successMessage = 'Login successful! Redirecting...';},

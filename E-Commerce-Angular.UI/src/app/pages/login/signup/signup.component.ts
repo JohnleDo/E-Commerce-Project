@@ -29,6 +29,7 @@ import { User } from '../../../models/user.model';
               />
               <div *ngIf="signupForm.get('userName')?.invalid && signupForm.get('userName')?.touched" class="mt-1 text-sm text-red-400">
                 <p *ngIf="signupForm.get('userName')?.errors?.['required']">Username is required</p>
+                <p *ngIf="signupForm.get('userName')?.errors?.['minlength']">Username must be at least 3 characters</p>
               </div>
             </div>
 
@@ -167,7 +168,7 @@ export class SignupComponent {
   constructor(private fb: FormBuilder, private router: Router, private userService: UserService) {
 
     this.signupForm = this.fb.group({
-      userName: ['', [Validators.required]],
+      userName: ['', [Validators.required, Validators.minLength(3)]],
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
@@ -201,6 +202,10 @@ export class SignupComponent {
 
     // TODO: Add messageService like from in products-manage
     const userData = this.signupForm.value;
+
+    // TODO: When given back the time it will be in my central local timezone. Best to standardize for everyone or something.
+    //       I like for it to be central in the backend for development purpose but in the case someone lives else where will
+    //       need to convert it to their local timezone.
     this.userService.AddUser(userData).subscribe({
       next: (result: User) => {
         this.isLoading = false;
