@@ -3,12 +3,13 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { SignupComponent } from "./signup/signup.component";
+import { UserService } from '../../services/user.service';
+import { User } from '../../models/user.model';
 
 // TODO: Hide header when on login/signup page
-// TODO: Implement actual POST for creating user
 // TODO: Implement actual authentication service
 // TODO: Prevent access to any page without authentication
-// TODO: When signing up, check if Username is available
+// TODO: Add "Remember me" functionality
 
 @Component({
   selector: 'app-login',
@@ -31,19 +32,19 @@ import { SignupComponent } from "./signup/signup.component";
             
             <!-- Email Field -->
             <div>
-              <label for="login-email" class="block text-sm font-medium text-gray-300 mb-2">
-                Email Address
+              <label for="login-userName" class="block text-sm font-medium text-gray-300 mb-2">
+                Username
               </label>
               <input
-                id="login-email"
-                type="email"
-                formControlName="email"
-                placeholder="you@example.com"
+                id="login-userName"
+                type="text"
+                formControlName="userName"
+                placeholder="Username"
                 class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
               />
-              <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="mt-1 text-sm text-red-400">
-                <p *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</p>
-                <p *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email</p>
+              <div *ngIf="loginForm.get('userName')?.invalid && loginForm.get('userName')?.touched" class="mt-1 text-sm text-red-400">
+                <p *ngIf="loginForm.get('userName')?.errors?.['required']">Username is required</p>
+                <p *ngIf="loginForm.get('userName')?.errors?.['minlength']">Username must be at least 3 characters</p>
               </div>
             </div>
 
@@ -129,9 +130,9 @@ export class LoginComponent {
   errorMessage = '';
   successMessage = '';
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private userService: UserService) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      userName: ['', [Validators.required, Validators.minLength(3)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       rememberMe: [false]
     });
@@ -154,20 +155,18 @@ export class LoginComponent {
     this.errorMessage = '';
     this.successMessage = '';
 
-    const { email, password, rememberMe } = this.loginForm.value;
+    const { userName, password, rememberMe } = this.loginForm.value;
 
-    // TODO: Replace with actual authentication service call
-    console.log('Login attempt:', { email, password, rememberMe });
-
-    // Simulated API call (replace with actual service)
-    setTimeout(() => {
-      this.isLoading = false;
-      this.successMessage = 'Login successful! Redirecting...';
-      
-      // Redirect to dashboard or products page
-      setTimeout(() => {
-        this.router.navigate(['/products']);
-      }, 1500);
-    }, 1500);
+    this.userService.UserLogin({ userName: userName, password }).subscribe({
+          next: (result: User) => {
+            this.isLoading = false;
+            console.log('Login successful:', result);
+            this.successMessage = 'Login successful! Redirecting...';},
+          error: (err) => {
+            this.isLoading = false;
+            this.errorMessage = 'An error occurred while trying to log in. Please try again.';
+            console.error('Login error:', err);
+          }
+        });
   }
 }

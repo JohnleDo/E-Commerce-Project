@@ -2,6 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { UserService } from '../../../services/user.service';
+import { User } from '../../../models/user.model';
+
+// TODO: Add validation if Username already exists
+// TODO: Add password strength validation
+// TODO: Add redirect where you're logged in with newly created account
 
 @Component({
   selector: 'app-signup',
@@ -153,13 +159,12 @@ import { Router } from '@angular/router';
   styles: ``
 })
 export class SignupComponent {
-  // @Input() signupForm!: FormGroup;
   signupForm: FormGroup;
   errorMessage = '';
   successMessage = '';
   isLoading = false;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private userService: UserService) {
 
     this.signupForm = this.fb.group({
       userName: ['', [Validators.required]],
@@ -194,20 +199,17 @@ export class SignupComponent {
     this.errorMessage = '';
     this.successMessage = '';
 
-    const { userName, firstName, lastName, email, password, agreeToTerms } = this.signupForm.value;
-
-    // TODO: Replace with actual authentication service call
-    console.log('Signup attempt:', { userName, firstName, lastName, email, password, agreeToTerms });
-
-    // Simulated API call (replace with actual service)
-    setTimeout(() => {
-      this.isLoading = false;
-      this.successMessage = 'Account created successfully! Redirecting...';
-      
-      // Redirect to dashboard or products page
-      setTimeout(() => {
-        this.router.navigate(['/']);
-      }, 1500);
-    }, 1500);
+    // TODO: Add messageService like from in products-manage
+    const userData = this.signupForm.value;
+    this.userService.AddUser(userData).subscribe({
+      next: (result: User) => {
+        this.isLoading = false;
+        this.successMessage = 'Account created successfully! Redirecting...';},
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = 'An error occurred while creating the account. Please try again.';
+        console.error('Signup error:', err);
+      }
+    });
   }
 }

@@ -5,6 +5,7 @@ import { ProductsListComponent } from "./pages/products-list/products-list.compo
 import { RoomInformation } from './models/roomInformation.model';
 import { RoomInformationService } from './services/room-information-service';
 import { ProductService } from './services/product.service';
+import { UserService } from './services/user.service';
 import { Product } from './models/products.model';
 
 @Component({
@@ -22,7 +23,8 @@ export class AppComponent {
   //productList: Product[] = []
 
   constructor(private roomInformationService: RoomInformationService,
-              private productService: ProductService
+              private productService: ProductService,
+              private userService: UserService
   ) {}
 
   // These are just testing the service and view it in console

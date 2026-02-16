@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { User } from '../models/user.model';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { LoginRequest } from '../models/api/login.request';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,13 @@ export class UserService {
     return this.http.post<User>(
       (environment as any).apiUrl + this.url,
       user
+    );
+  }
+
+  public UserLogin(loginRequest: LoginRequest): Observable<User> {
+    return this.http.post<User>(
+      (environment as any).apiUrl + this.url + "/Login",
+      loginRequest
     );
   }
 }
