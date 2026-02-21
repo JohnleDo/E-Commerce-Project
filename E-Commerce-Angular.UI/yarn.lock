@@ -189,7 +189,7 @@
     symbol-observable "4.0.0"
     yargs "17.7.2"
 
-"@angular/common@^19.0.0", "@angular/common@^19.0.0 || ^20.0.0", "@angular/common@^19.2.0", "@angular/common@19.2.10":
+"@angular/common@^19.0.0", "@angular/common@^19.0.0 || ^20.0.0", "@angular/common@^19.2.0", "@angular/common@>=14.0.0", "@angular/common@19.2.10":
   version "19.2.10"
   resolved "https://registry.npmjs.org/@angular/common/-/common-19.2.10.tgz"
   integrity sha512-1Aq0pT0MXEYHUXFB0nFkiErW7OUCLxF2XkZv///hxWEBX3nc4Zl+p9yrVRvnTJoLuOVU5TYOPjiyKzAGbUIxVw==
@@ -258,6 +258,13 @@
   integrity sha512-bmt3ws3L4pYTlI8FW5L1ShyOeUQobXA7wy6TbcIToEonZk+i8uj3xlTD9Ymnjkb9wbNXrD1qoNSpP86c7C1rWQ==
   dependencies:
     tslib "^2.3.0"
+
+"@auth0/angular-jwt@^5.2.0":
+  version "5.2.0"
+  resolved "https://registry.npmjs.org/@auth0/angular-jwt/-/angular-jwt-5.2.0.tgz"
+  integrity sha512-9FS2L0QwGNlxA/zgeehCcsR9CZscouyXkoIj1fODM36A8BLfdzg9k9DWAXUQ2Drjk0AypGAFzeNZR4vsLMhdeQ==
+  dependencies:
+    tslib "^2.0.0"
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.26.2", "@babel/code-frame@^7.27.1":
   version "7.27.1"

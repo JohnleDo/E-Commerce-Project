@@ -3,7 +3,9 @@ import { ProductsListComponent } from './pages/products-list/products-list.compo
 import { CartComponent } from './pages/cart/cart.component';
 import { ProductsManageComponent } from './pages/products-manage/products-manage.component';
 import { LoginComponent } from './pages/login/login.component';
+import { AuthGuard } from './guards/auth.guard';
 
+// TODO: Add roles and permissions to protect routes based on user roles/permissions
 export const routes: Routes = [
     {
         path: '',
@@ -16,7 +18,8 @@ export const routes: Routes = [
     },
     {   
         path: 'manage',
-        component: ProductsManageComponent
+        component: ProductsManageComponent,
+        canActivate: [AuthGuard] // Protect this route with AuthGuard
     },
     {   
         path: 'login',

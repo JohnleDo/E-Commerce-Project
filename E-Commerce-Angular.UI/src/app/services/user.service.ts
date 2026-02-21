@@ -24,11 +24,4 @@ export class UserService {
       user
     );
   }
-
-  public UserLogin(loginRequest: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(
-      (environment as any).apiUrl + this.url + "/Login",
-      loginRequest
-    );
-  }
 }

@@ -6,6 +6,7 @@ import { SignupComponent } from "./signup/signup.component";
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
 import { LoginResponse } from '../../models/api/login.response';
+import { AuthService } from '../../services/authentication.service';
 
 // TODO: Hide header when on login/signup page
 // TODO: Implement actual authentication service
@@ -131,7 +132,7 @@ export class LoginComponent {
   errorMessage = '';
   successMessage = '';
 
-  constructor(private fb: FormBuilder, private router: Router, private userService: UserService) {
+  constructor(private fb: FormBuilder, private router: Router, private userService: UserService, private authService: AuthService) {
     this.loginForm = this.fb.group({
       userName: ['', [Validators.required, Validators.minLength(3)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -159,11 +160,13 @@ export class LoginComponent {
     const { userName, password, rememberMe } = this.loginForm.value;
 
     // TODO: Display error messages based on actual error (e.g. invalid credentials, server error, etc.)
-    this.userService.UserLogin({ userName: userName, password }).subscribe({
+    this.authService.UserLogin({ userName: userName, password }).subscribe({
           next: (result: LoginResponse) => {
             this.isLoading = false;
             console.log('Login successful:', result);
-            this.successMessage = 'Login successful! Redirecting...';},
+            this.successMessage = 'Login successful! Redirecting...';
+            setTimeout(() => this.router.navigate(['/']), 1500); // 1.5s pause
+          },
           error: (err) => {
             this.isLoading = false;
             this.errorMessage = 'An error occurred while trying to log in. Please try again.';

@@ -206,6 +206,7 @@ export class SignupComponent {
     // TODO: When given back the time it will be in my central local timezone. Best to standardize for everyone or something.
     //       I like for it to be central in the backend for development purpose but in the case someone lives else where will
     //       need to convert it to their local timezone.
+    // TODO: Update this to use AuthService to sign up so it can obtain the token too.
     this.userService.AddUser(userData).subscribe({
       next: (result: User) => {
         this.isLoading = false;
